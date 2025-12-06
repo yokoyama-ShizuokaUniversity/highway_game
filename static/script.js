@@ -46,9 +46,7 @@ function renderBoard(hw) {
   container.style.transform = `scale(${zoom / 100})`;
   container.style.transformOrigin = "0 50%";
 
-  const base = document.createElement("div");
-  base.className = "road-base";
-  container.appendChild(base);
+  board.appendChild(container);
 
   const positionedNodes = hw.nodes.map((node) => ({
     ...node,
@@ -56,21 +54,26 @@ function renderBoard(hw) {
     y: typeof node.y === "number" ? node.y : 50,
   }));
 
+  const widthPx = board.clientWidth;
+  const heightPx = container.offsetHeight || 1;
+
   // segments between consecutive nodes
   for (let i = 0; i < positionedNodes.length - 1; i++) {
     const start = positionedNodes[i];
     const end = positionedNodes[i + 1];
     const dx = end.x - start.x;
     const dy = end.y - start.y;
-    const length = Math.sqrt(dx * dx + dy * dy);
-    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+    const scaledDx = (dx / 100) * widthPx;
+    const scaledDy = (dy / 100) * heightPx;
+    const length = Math.sqrt(scaledDx * scaledDx + scaledDy * scaledDy);
+    const angle = Math.atan2(scaledDy, scaledDx) * (180 / Math.PI);
     const segment = document.createElement("div");
     segment.className = "segment";
     segment.dataset.from = start.id;
     segment.dataset.to = end.id;
     segment.style.left = `${start.x}%`;
     segment.style.top = `${start.y}%`;
-    segment.style.width = `${length}%`;
+    segment.style.width = `${length}px`;
     segment.style.transform = `translateY(-50%) rotate(${angle}deg)`;
     container.appendChild(segment);
   }
@@ -84,6 +87,8 @@ function renderBoard(hw) {
     const icon = clone.querySelector(".icon");
     const input = clone.querySelector(".node-input");
     input.value = "";
+    const desiredWidth = Math.max(node.name.length + 1, 6);
+    input.style.width = `${desiredWidth}ch`;
 
     let iconLabel = "〇";
     let extraClass = "ic";
@@ -118,6 +123,9 @@ function renderBoard(hw) {
     hw.landmarks.forEach((lm) => {
       const lmEl = document.createElement("div");
       lmEl.className = "landmark";
+      if (lm.type) {
+        lmEl.classList.add(String(lm.type));
+      }
       lmEl.textContent = lm.name;
       lmEl.style.left = `${lm.x}%`;
       lmEl.style.top = `${lm.y}%`;
@@ -130,7 +138,6 @@ function renderBoard(hw) {
   status.className = "status-message";
   status.textContent = "入力して高速道路を完成させよう";
 
-  board.appendChild(container);
   board.appendChild(status);
 }
 

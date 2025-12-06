@@ -5,18 +5,20 @@
       "name": "東名高速道路",
       "description": "東京IC〜御殿場ICのデモ区間",
       "landmarks": [
-        {"name": "東京方面", "x": 2, "y": 80},
-        {"name": "御殿場", "x": 92, "y": 35}
+        {"name": "東京方面", "x": 96, "y": 76, "type": "direction"},
+        {"name": "御殿場・名古屋方面", "x": 6, "y": 32, "type": "direction"},
+        {"name": "首都圏", "x": 90, "y": 60, "type": "city"},
+        {"name": "箱根外輪山", "x": 20, "y": 40, "type": "landform"}
       ],
       "nodes": [
-        {"id": "tokyo", "name": "東京IC", "kind": "IC", "km": 0, "x": 4, "y": 50},
-        {"id": "yokohama-cho", "name": "横浜町田IC", "kind": "IC", "km": 23.8, "x": 18, "y": 48},
-        {"id": "ebina", "name": "海老名JCT", "kind": "JCT", "km": 31.4, "x": 26, "y": 45},
-        {"id": "atsugi", "name": "厚木IC", "kind": "IC", "km": 35.7, "x": 32, "y": 47},
-        {"id": "hadano", "name": "秦野中井IC", "kind": "IC", "km": 53.3, "x": 46, "y": 52},
-        {"id": "oi", "name": "大井松田IC", "kind": "IC", "km": 63.9, "x": 56, "y": 48},
-        {"id": "ashigara", "name": "足柄SA", "kind": "SA", "km": 78.0, "x": 72, "y": 43},
-        {"id": "gotenba", "name": "御殿場IC", "kind": "IC", "km": 84.4, "x": 90, "y": 40}
+        {"id": "tokyo", "name": "東京IC", "kind": "IC", "km": 0, "x": 94, "y": 58},
+        {"id": "yokohama-cho", "name": "横浜町田IC", "kind": "IC", "km": 23.8, "x": 80, "y": 60},
+        {"id": "ebina", "name": "海老名JCT", "kind": "JCT", "km": 31.4, "x": 72, "y": 54},
+        {"id": "atsugi", "name": "厚木IC", "kind": "IC", "km": 35.7, "x": 66, "y": 57},
+        {"id": "hadano", "name": "秦野中井IC", "kind": "IC", "km": 53.3, "x": 50, "y": 52},
+        {"id": "oi", "name": "大井松田IC", "kind": "IC", "km": 63.9, "x": 40, "y": 48},
+        {"id": "ashigara", "name": "足柄SA", "kind": "SA", "km": 78.0, "x": 24, "y": 44},
+        {"id": "gotenba", "name": "御殿場IC", "kind": "IC", "km": 84.4, "x": 10, "y": 38}
       ]
     },
     {
@@ -24,16 +26,18 @@
       "name": "新東名高速道路",
       "description": "海老名南JCT〜御殿場JCTのデモ区間",
       "landmarks": [
-        {"name": "海老名南", "x": 22, "y": 30},
-        {"name": "御殿場", "x": 88, "y": 18}
+        {"name": "東京方面", "x": 92, "y": 66, "type": "direction"},
+        {"name": "御殿場・名古屋方面", "x": 8, "y": 22, "type": "direction"},
+        {"name": "相模平野", "x": 70, "y": 34, "type": "landform"},
+        {"name": "富士山遠望", "x": 16, "y": 28, "type": "landform"}
       ],
       "nodes": [
-        {"id": "ebina-minami", "name": "海老名南JCT", "kind": "JCT", "km": 0, "x": 24, "y": 28},
-        {"id": "aikawa", "name": "相模原愛川IC", "kind": "IC", "km": 8.1, "x": 34, "y": 26},
-        {"id": "hadano-nakai", "name": "秦野IC", "kind": "IC", "km": 22.5, "x": 48, "y": 23},
-        {"id": "nagaizumi-numazu", "name": "長泉沼津IC", "kind": "IC", "km": 40.2, "x": 70, "y": 22},
-        {"id": "expasa-neopasa", "name": "駿河湾沼津SA", "kind": "SA", "km": 46.4, "x": 76, "y": 20},
-        {"id": "gotenba-jct", "name": "御殿場JCT", "kind": "JCT", "km": 55.4, "x": 88, "y": 18}
+        {"id": "ebina-minami", "name": "海老名南JCT", "kind": "JCT", "km": 0, "x": 76, "y": 46},
+        {"id": "aikawa", "name": "相模原愛川IC", "kind": "IC", "km": 8.1, "x": 66, "y": 42},
+        {"id": "hadano-nakai", "name": "秦野IC", "kind": "IC", "km": 22.5, "x": 52, "y": 36},
+        {"id": "nagaizumi-numazu", "name": "長泉沼津IC", "kind": "IC", "km": 40.2, "x": 28, "y": 32},
+        {"id": "expasa-neopasa", "name": "駿河湾沼津SA", "kind": "SA", "km": 46.4, "x": 20, "y": 30},
+        {"id": "gotenba-jct", "name": "御殿場JCT", "kind": "JCT", "km": 55.4, "x": 10, "y": 24}
       ]
     }
   ]
