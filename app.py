@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, asdict
-from typing import Dict, List
+from pathlib import Path
+from typing import Dict, List, Optional
 
 from flask import Flask, jsonify, render_template
 
@@ -14,6 +16,8 @@ class Node:
     name: str
     kind: str  # IC, JCT, PA, SA
     km: float
+    x: Optional[float] = None
+    y: Optional[float] = None
 
 
 @dataclass
@@ -21,6 +25,7 @@ class Highway:
     id: str
     name: str
     description: str
+    landmarks: List[Dict[str, float]]
     nodes: List[Node]
 
     def to_dict(self) -> Dict:
@@ -28,28 +33,30 @@ class Highway:
             "id": self.id,
             "name": self.name,
             "description": self.description,
+            "landmarks": self.landmarks,
             "nodes": [asdict(node) for node in self.nodes],
         }
 
 
-# Demo data: 東名高速道路 (一部区間)
-highways: Dict[str, Highway] = {
-    "tomei": Highway(
-        id="tomei",
-        name="東名高速道路",
-        description="東京IC〜御殿場ICのデモ区間",
-        nodes=[
-            Node(id="tokyo", name="東京IC", kind="IC", km=0),
-            Node(id="yokohama-cho", name="横浜町田IC", kind="IC", km=23.8),
-            Node(id="ebina", name="海老名JCT", kind="JCT", km=31.4),
-            Node(id="atsugi", name="厚木IC", kind="IC", km=35.7),
-            Node(id="hadano", name="秦野中井IC", kind="IC", km=53.3),
-            Node(id="oi", name="大井松田IC", kind="IC", km=63.9),
-            Node(id="ashigara", name="足柄SA", kind="SA", km=78.0),
-            Node(id="gotenba", name="御殿場IC", kind="IC", km=84.4),
-        ],
-    )
-}
+def load_highways() -> Dict[str, Highway]:
+    data_path = Path(__file__).parent / "data" / "highways.json"
+    with data_path.open(encoding="utf-8") as f:
+        payload = json.load(f)
+
+    loaded: Dict[str, Highway] = {}
+    for hw in payload.get("highways", []):
+        highway = Highway(
+            id=hw["id"],
+            name=hw["name"],
+            description=hw.get("description", ""),
+            landmarks=hw.get("landmarks", []),
+            nodes=[Node(**node) for node in hw.get("nodes", [])],
+        )
+        loaded[highway.id] = highway
+    return loaded
+
+
+highways: Dict[str, Highway] = load_highways()
 
 
 @app.route("/")
