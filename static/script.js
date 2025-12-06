@@ -7,10 +7,15 @@ const info = document.getElementById("highway-info");
 const nodeTemplate = document.getElementById("node-template");
 const zoomRange = document.getElementById("zoom-range");
 const zoomValue = document.getElementById("zoom-value");
+const panRange = document.getElementById("pan-range");
+const panValue = document.getElementById("pan-value");
 
 let currentHighway = null;
 let nodeStates = new Map();
 let zoom = 100;
+let panX = 0;
+panValue.textContent = `${panX}px`;
+zoomValue.textContent = `${zoom}%`;
 
 async function loadHighways() {
   const res = await fetch("/api/highways");
@@ -43,8 +48,8 @@ function renderBoard(hw) {
   container.className = "road-container";
 
   // zoom
-  container.style.transform = `scale(${zoom / 100})`;
-  container.style.transformOrigin = "0 50%";
+  container.style.transform = `translate(${panX}px, 0) scale(${zoom / 100})`;
+  container.style.transformOrigin = "50% 50%";
 
   board.appendChild(container);
 
@@ -90,22 +95,16 @@ function renderBoard(hw) {
     const desiredWidth = Math.max(node.name.length + 1, 6);
     input.style.width = `${desiredWidth}ch`;
 
-    let iconLabel = "〇";
     let extraClass = "ic";
     if (node.kind === "JCT") {
-      iconLabel = "◇";
       extraClass = "jct";
     } else if (node.kind === "PA") {
-      iconLabel = "■";
       extraClass = "pa";
     } else if (node.kind === "SA") {
-      iconLabel = "□";
       extraClass = "sa";
     }
     icon.textContent = "";
-    const span = document.createElement("span");
-    span.textContent = iconLabel;
-    icon.appendChild(span);
+    icon.setAttribute("aria-label", `${node.name} (${node.kind})`);
     clone.classList.add(extraClass);
 
     input.addEventListener("input", () => handleInput(node.id, input.value));
@@ -242,6 +241,13 @@ giveUpButton.addEventListener("click", giveUp);
 zoomRange.addEventListener("input", (e) => {
   zoom = Number(e.target.value);
   zoomValue.textContent = `${zoom}%`;
+  if (currentHighway) {
+    renderBoard(currentHighway);
+  }
+});
+panRange.addEventListener("input", (e) => {
+  panX = Number(e.target.value);
+  panValue.textContent = `${panX}px`;
   if (currentHighway) {
     renderBoard(currentHighway);
   }
