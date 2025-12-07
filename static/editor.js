@@ -26,6 +26,7 @@ function addRow(data = {}) {
       <select>
         <option value="IC" ${data.kind === "IC" ? "selected" : ""}>IC</option>
         <option value="JCT" ${data.kind === "JCT" ? "selected" : ""}>JCT</option>
+        <option value="SIC" ${data.kind === "SIC" ? "selected" : ""}>SIC</option>
         <option value="PA" ${data.kind === "PA" ? "selected" : ""}>PA</option>
         <option value="SA" ${data.kind === "SA" ? "selected" : ""}>SA</option>
       </select>

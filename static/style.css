@@ -179,11 +179,16 @@ body {
   background: white;
 }
 
+.node.sic .icon {
+  background: var(--ink);
+  color: white;
+}
+
 .node.jct .icon {
   width: 32px;
   height: 32px;
   border-radius: 6px;
-  transform: rotate(45deg);
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 
 .node.jct .icon span {
@@ -246,6 +251,62 @@ body {
   left: 0;
   top: -28px;
   transform: translate(-50%, 0);
+}
+
+.legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px 16px;
+  margin: 12px 32px 0;
+  padding: 12px 16px;
+  background: #eef3f8;
+  border-radius: 10px;
+  border: 1px solid #d9e2ec;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #1f2933;
+}
+
+.legend-icon {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: white;
+}
+
+.legend-icon.pa {
+  border-radius: 4px;
+  background: var(--ink);
+  color: white;
+}
+
+.legend-icon.sa {
+  border-radius: 4px;
+  background: white;
+}
+
+.legend-icon.jct {
+  border-radius: 6px;
+  transform: rotate(45deg);
+}
+
+.legend-icon.jct span {
+  transform: rotate(-45deg);
+  display: inline-block;
+}
+
+.legend-icon.sic {
+  background: var(--ink);
+  color: white;
 }
 
 .landmark {

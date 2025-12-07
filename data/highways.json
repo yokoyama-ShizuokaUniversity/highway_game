@@ -26,6 +26,7 @@
         {"id": "ayuzawa", "name": "鮎沢PA", "kind": "PA", "km": 69.0, "lat": 35.319, "lon": 139.086},
         {"id": "ashigara", "name": "足柄SA", "kind": "SA", "km": 78.0, "lat": 35.318, "lon": 139.026},
         {"id": "gotenba", "name": "御殿場IC", "kind": "IC", "km": 84.4, "lat": 35.309, "lon": 138.940},
+        {"id": "komakado-sic", "name": "駒門スマートIC", "kind": "SIC", "km": 89.5, "lat": 35.308, "lon": 138.917},
         {"id": "susono", "name": "裾野IC", "kind": "IC", "km": 94.0, "lat": 35.280, "lon": 138.907},
         {"id": "numazu", "name": "沼津IC", "kind": "IC", "km": 104.0, "lat": 35.136, "lon": 138.862},
         {"id": "fuji", "name": "富士IC", "kind": "IC", "km": 120.0, "lat": 35.150, "lon": 138.669},

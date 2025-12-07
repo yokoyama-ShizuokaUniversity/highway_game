@@ -60,6 +60,7 @@ function renderBoard(hw) {
   board.appendChild(container);
 
   const positionedNodes = stretchNodes(computeNormalizedNodes(hw.nodes));
+  const labelOffsets = computeLabelOffsets(positionedNodes);
 
   const widthPx = board.clientWidth || 1;
   const layout = measureSpan(positionedNodes);
@@ -100,16 +101,29 @@ function renderBoard(hw) {
     input.value = "";
     const desiredWidth = Math.max(node.name.length + 1, 6);
     input.style.width = `${desiredWidth}ch`;
+    const offset = labelOffsets.get(node.id) || { x: 0, y: 0 };
+    input.style.left = `${offset.x}px`;
+    input.style.top = `${34 + offset.y}px`;
 
     let extraClass = "ic";
+    let iconSymbol = "〇";
     if (node.kind === "JCT") {
       extraClass = "jct";
+      iconSymbol = "◇";
     } else if (node.kind === "PA") {
       extraClass = "pa";
+      iconSymbol = "■";
     } else if (node.kind === "SA") {
       extraClass = "sa";
+      iconSymbol = "□";
+    } else if (node.kind === "SIC") {
+      extraClass = "sic";
+      iconSymbol = "●";
     }
     icon.textContent = "";
+    const iconGlyph = document.createElement("span");
+    iconGlyph.textContent = iconSymbol;
+    icon.appendChild(iconGlyph);
     icon.setAttribute("aria-label", `${node.name} (${node.kind})`);
     clone.classList.add(extraClass);
 
@@ -118,6 +132,8 @@ function renderBoard(hw) {
     const label = document.createElement("div");
     label.className = "node-label";
     label.textContent = `${node.kind}`;
+    label.style.left = `${offset.x}px`;
+    label.style.top = `${-28 + offset.y}px`;
     clone.appendChild(label);
 
     container.appendChild(clone);
@@ -168,10 +184,12 @@ function normalizeName(text) {
 function stripSuffix(name) {
   const suffixes = [
     "ic",
+    "sic",
     "jct",
     "pa",
     "sa",
     "インターチェンジ",
+    "スマートインターチェンジ",
     "ジャンクション",
     "サービスエリア",
     "パーキングエリア",
@@ -183,6 +201,29 @@ function stripSuffix(name) {
     }
   });
   return normalized;
+}
+
+function computeLabelOffsets(nodes) {
+  const offsets = new Map();
+  nodes.forEach((node, idx) => {
+    const prev = nodes[idx - 1] || nodes[idx + 1];
+    const next = nodes[idx + 1] || nodes[idx - 1];
+    if (!prev || !next) {
+      offsets.set(node.id, { x: 0, y: 0 });
+      return;
+    }
+    const vx = next.x - prev.x;
+    const vy = next.y - prev.y;
+    const len = Math.hypot(vx, vy) || 1;
+    const nx = vx / len;
+    const ny = vy / len;
+    const px = -ny;
+    const py = nx;
+    const spread = 26;
+    const side = idx % 2 === 0 ? 1 : -1;
+    offsets.set(node.id, { x: px * spread * side, y: py * spread * side });
+  });
+  return offsets;
 }
 
 function isCorrectInput(userInput, expected) {

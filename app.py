@@ -14,7 +14,7 @@ app = Flask(__name__)
 class Node:
     id: str
     name: str
-    kind: str  # IC, JCT, PA, SA
+    kind: str  # IC, JCT, PA, SA, SIC
     km: float
     lat: Optional[float] = None
     lon: Optional[float] = None
