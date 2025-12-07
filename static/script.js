@@ -18,8 +18,10 @@ let nodeStates = new Map();
 let zoom = 100;
 let panX = 0;
 let panY = 0;
-const DISTANCE_SCALE = 1.65;
-const MIN_GAP = 16;
+// Stronger spreading to keep icons and inputs from overlapping while
+// still following the original heading between nodes.
+const DISTANCE_SCALE = 2.35;
+const MIN_GAP = 24;
 panValueX.textContent = `${panX}px`;
 panValueY.textContent = `${panY}px`;
 zoomValue.textContent = `${zoom}%`;
@@ -233,9 +235,10 @@ function computeLabelOffsets(nodes) {
     const px = -ny;
     const py = nx;
     const neighborDist = Math.hypot(next.x - node.x, next.y - node.y) || 1;
-    const spreadBase = 52;
-    const spreadBoost = Math.max(0, MIN_GAP * 1.2 - neighborDist) * 0.9;
-    const spread = Math.min(120, spreadBase + spreadBoost);
+    // Spread labels farther away from dense neighbors to avoid text/input overlap.
+    const spreadBase = 78;
+    const spreadBoost = Math.max(0, MIN_GAP * 1.25 - neighborDist) * 1.05;
+    const spread = Math.min(140, spreadBase + spreadBoost);
     const side = idx % 2 === 0 ? 1 : -1;
     offsets.set(node.id, { x: px * spread * side, y: py * spread * side });
   });
