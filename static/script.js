@@ -17,6 +17,7 @@ let nodeStates = new Map();
 let zoom = 100;
 let panX = 0;
 let panY = 0;
+const DISTANCE_SCALE = 1.25;
 panValueX.textContent = `${panX}px`;
 panValueY.textContent = `${panY}px`;
 zoomValue.textContent = `${zoom}%`;
@@ -57,7 +58,7 @@ function renderBoard(hw) {
 
   board.appendChild(container);
 
-  const positionedNodes = computeNormalizedNodes(hw.nodes);
+  const positionedNodes = stretchNodes(computeNormalizedNodes(hw.nodes));
 
   const widthPx = board.clientWidth || 1;
   const layout = measureSpan(positionedNodes);
@@ -240,6 +241,18 @@ function computeNormalizedNodes(nodes) {
     const normY = 100 - (coords[idx].dy / span) * 100;
     return { ...node, x: normX, y: normY };
   });
+}
+
+function stretchNodes(nodes) {
+  if (!nodes.length) return nodes;
+  const layout = measureSpan(nodes);
+  const cx = layout.minX + layout.spanX / 2;
+  const cy = layout.minY + layout.spanY / 2;
+  return nodes.map((n) => ({
+    ...n,
+    x: (n.x - cx) * DISTANCE_SCALE + cx,
+    y: (n.y - cy) * DISTANCE_SCALE + cy,
+  }));
 }
 
 function updateNodeUI(nodeId, entry, hasInput) {

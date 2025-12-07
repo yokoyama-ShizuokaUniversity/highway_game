@@ -72,11 +72,6 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/editor")
-def editor():
-    return render_template("editor.html")
-
-
 @app.route("/api/highways")
 def list_highways():
     data = [highway.to_dict() for highway in highways.values()]

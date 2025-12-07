@@ -121,11 +121,9 @@ body {
 
 .node {
   position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
   transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
 }
 
 .icon {
@@ -139,6 +137,10 @@ body {
   border: 3px solid var(--ink);
   border-radius: 50%;
   transition: border-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
 }
 
 .node.pa .icon {
@@ -169,6 +171,11 @@ body {
   border: 1px solid #cbd2da;
   border-radius: 6px;
   font-size: 14px;
+  position: absolute;
+  top: 34px;
+  left: 0;
+  transform: translate(-50%, 0);
+  background: white;
 }
 
 .node-input:focus {
@@ -209,8 +216,11 @@ body {
 }
 
 .node-label {
-  margin-top: -4px;
   font-size: 12px;
+  position: absolute;
+  left: 0;
+  top: -28px;
+  transform: translate(-50%, 0);
 }
 
 .landmark {

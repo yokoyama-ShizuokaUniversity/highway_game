@@ -1,8 +1,10 @@
 const tableBody = document.querySelector("#node-table tbody");
 const addRowButton = document.getElementById("add-row");
 const reorderButton = document.getElementById("reorder");
+const saveButton = document.getElementById("save");
 const resultEl = document.getElementById("result");
 const jsonOutput = document.getElementById("json-output");
+const saveStatus = document.getElementById("save-status");
 
 function slugify(text) {
   return text
@@ -108,11 +110,9 @@ function normalizeFromGeo(nodes) {
   }));
 }
 
-function renderResult(nodes) {
+function buildHighway(nodes) {
   if (!nodes.length) {
-    resultEl.textContent = "地点を1件以上入力してください";
-    jsonOutput.textContent = "";
-    return;
+    return null;
   }
 
   const startIdx = Math.max(nodes.findIndex((n) => n.isStart), 0);
@@ -147,18 +147,58 @@ function renderResult(nodes) {
     };
   });
 
-  const highway = {
-    id: document.getElementById("hw-id").value || "sample-highway",
-    name: document.getElementById("hw-name").value || "未命名高速道路",
-    origin_city: document.getElementById("hw-origin").value || "",
-    destination_city: document.getElementById("hw-destination").value || "",
-    nodes: nodesForJson,
+  return {
+    highway: {
+      id: document.getElementById("hw-id").value || "sample-highway",
+      name: document.getElementById("hw-name").value || "未命名高速道路",
+      origin_city: document.getElementById("hw-origin").value || "",
+      destination_city: document.getElementById("hw-destination").value || "",
+      nodes: nodesForJson,
+    },
+    totalKm,
   };
+}
 
-  resultEl.textContent = `並び替え完了: 全${nodesForJson.length}地点 / 想定距離 ${totalKm.toFixed(
+function renderResult(nodes) {
+  if (!nodes.length) {
+    resultEl.textContent = "地点を1件以上入力してください";
+    jsonOutput.textContent = "";
+    return;
+  }
+
+  const built = buildHighway(nodes);
+  if (!built) return;
+
+  resultEl.textContent = `並び替え完了: 全${built.highway.nodes.length}地点 / 想定距離 ${built.totalKm.toFixed(
     1
   )}km`;
-  jsonOutput.textContent = JSON.stringify(highway, null, 2);
+  jsonOutput.textContent = JSON.stringify(built.highway, null, 2);
+}
+
+async function saveHighwayToFile() {
+  saveStatus.textContent = "";
+  const rows = readRows();
+  const validRows = rows.filter(
+    (r) => r.name && Number.isFinite(r.lat) && Number.isFinite(r.lon)
+  );
+  const built = buildHighway(validRows);
+  if (!built) {
+    saveStatus.textContent = "地点を正しく入力してください";
+    return;
+  }
+  renderResult(validRows);
+  const res = await fetch("/api/highways", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(built.highway),
+  });
+
+  if (res.ok) {
+    saveStatus.textContent = "保存しました。ゲーム用アプリで即時参照できます。";
+  } else {
+    const error = await res.json().catch(() => ({ error: "保存に失敗しました" }));
+    saveStatus.textContent = error.error || "保存に失敗しました";
+  }
 }
 
 addRowButton.addEventListener("click", () => addRow());
@@ -168,6 +208,9 @@ reorderButton.addEventListener("click", () => {
     (r) => r.name && Number.isFinite(r.lat) && Number.isFinite(r.lon)
   );
   renderResult(validRows);
+});
+saveButton.addEventListener("click", () => {
+  saveHighwayToFile();
 });
 
 // 初期行を2つ用意
