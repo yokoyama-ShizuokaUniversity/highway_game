@@ -251,6 +251,35 @@ body {
   transform: translate(-50%, 0);
 }
 
+.text-row {
+  position: absolute;
+  left: 0;
+  top: 34px;
+  transform: translate(-50%, 0);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px 6px;
+  border-radius: 8px;
+  border: 1px solid #d0d7e2;
+}
+
+.text-row .node-input {
+  position: static;
+  transform: none;
+}
+
+.kind-badge {
+  padding: 4px 6px;
+  background: #0f8bd6;
+  color: white;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .jct-connection {
   position: absolute;
   left: 0;

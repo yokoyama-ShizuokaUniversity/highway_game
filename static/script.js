@@ -19,7 +19,7 @@ let zoom = 100;
 let panX = 0;
 let panY = 0;
 const DISTANCE_SCALE = 2.2;
-const MIN_GAP = 14;
+const MIN_GAP = 18;
 panValueX.textContent = `${panX}px`;
 panValueY.textContent = `${panY}px`;
 zoomValue.textContent = `${zoom}%`;
@@ -109,14 +109,11 @@ function renderBoard(hw) {
     const icon = clone.querySelector(".icon");
     const input = clone.querySelector(".node-input");
     input.value = "";
-    const desiredWidth = Math.max(node.name.length + 4, 10);
+    const desiredWidth = Math.max(node.name.length + 4, 12);
     input.style.width = `${desiredWidth}ch`;
     const offset = labelOffsets.get(node.id) || { x: 0, y: 0 };
-    input.style.left = `${offset.x}px`;
-    input.style.top = `${36 + offset.y}px`;
 
     let extraClass = "ic";
-    let iconSymbol = "";
     if (node.kind === "JCT") {
       extraClass = "jct";
     } else if (node.kind === "PA") {
@@ -126,18 +123,21 @@ function renderBoard(hw) {
     } else if (node.kind === "SIC") {
       extraClass = "sic";
     }
-    icon.textContent = iconSymbol;
     icon.setAttribute("aria-label", `${node.name} (${node.kind})`);
     clone.classList.add(extraClass);
 
-    input.addEventListener("input", () => handleInput(node.id, input.value));
+    const textRow = document.createElement("div");
+    textRow.className = "text-row";
+    textRow.style.left = `${offset.x}px`;
+    textRow.style.top = `${36 + offset.y}px`;
+    const badge = document.createElement("span");
+    badge.className = "kind-badge";
+    badge.textContent = node.kind;
 
-    const label = document.createElement("div");
-    label.className = "node-label";
-    label.textContent = `${node.kind}`;
-    label.style.left = `${offset.x}px`;
-    label.style.top = `${-26 + offset.y}px`;
-    clone.appendChild(label);
+    input.addEventListener("input", () => handleInput(node.id, input.value));
+    textRow.appendChild(input);
+    textRow.appendChild(badge);
+    clone.appendChild(textRow);
 
     if (node.kind === "JCT" && (node.connection_road || node.connection_cities)) {
       const conn = document.createElement("div");
@@ -146,7 +146,7 @@ function renderBoard(hw) {
       const cities = node.connection_cities ? `（${node.connection_cities}）` : "";
       conn.textContent = `${road}${cities}`.trim();
       conn.style.left = `${offset.x}px`;
-      conn.style.top = `${12 + offset.y}px`;
+      conn.style.top = `${36 + offset.y + 32}px`;
       clone.appendChild(conn);
     }
 
@@ -234,7 +234,9 @@ function computeLabelOffsets(nodes) {
     const px = -ny;
     const py = nx;
     const neighborDist = Math.hypot(next.x - node.x, next.y - node.y) || 1;
-    const spread = 60 + Math.max(0, MIN_GAP * 1.6 - neighborDist) * 1.2;
+    const spreadBase = 38;
+    const spreadBoost = Math.max(0, MIN_GAP * 1.2 - neighborDist) * 0.9;
+    const spread = Math.min(90, spreadBase + spreadBoost);
     const side = idx % 2 === 0 ? 1 : -1;
     offsets.set(node.id, { x: px * spread * side, y: py * spread * side });
   });
