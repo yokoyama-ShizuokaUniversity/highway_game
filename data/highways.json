@@ -1,0 +1,68 @@
+{
+  "highways": [
+    {
+      "id": "tomei",
+      "name": "東名高速道路",
+      "description": "東京IC〜浜松西ICのデモ区間",
+      "origin_city": "東京都世田谷区",
+      "destination_city": "静岡県浜松市西区",
+      "landmarks": [
+        {"name": "東京方面", "x": 96, "y": 80, "type": "direction"},
+        {"name": "浜松・名古屋方面", "x": 2, "y": 26, "type": "direction"},
+        {"name": "首都圏", "x": 88, "y": 62, "type": "city"},
+        {"name": "静岡市街", "x": 34, "y": 46, "type": "city"},
+        {"name": "浜松市街", "x": 8, "y": 52, "type": "city"},
+        {"name": "箱根外輪山", "x": 60, "y": 34, "type": "landform"},
+        {"name": "富士山遠望", "x": 44, "y": 30, "type": "landform"}
+      ],
+      "nodes": [
+        {"id": "tokyo", "name": "東京IC", "kind": "IC", "km": 0, "lat": 35.631, "lon": 139.639},
+        {"id": "yokohama-cho", "name": "横浜町田IC", "kind": "IC", "km": 23.8, "lat": 35.513, "lon": 139.470},
+        {"id": "ebina", "name": "海老名JCT", "kind": "JCT", "km": 31.4, "lat": 35.439, "lon": 139.389},
+        {"id": "atsugi", "name": "厚木IC", "kind": "IC", "km": 35.7, "lat": 35.439, "lon": 139.337},
+        {"id": "ebina-sa", "name": "海老名SA", "kind": "SA", "km": 38.0, "lat": 35.438, "lon": 139.365},
+        {"id": "hadano", "name": "秦野中井IC", "kind": "IC", "km": 53.3, "lat": 35.345, "lon": 139.228},
+        {"id": "oi", "name": "大井松田IC", "kind": "IC", "km": 63.9, "lat": 35.332, "lon": 139.157},
+        {"id": "ayuzawa", "name": "鮎沢PA", "kind": "PA", "km": 69.0, "lat": 35.319, "lon": 139.086},
+        {"id": "ashigara", "name": "足柄SA", "kind": "SA", "km": 78.0, "lat": 35.318, "lon": 139.026},
+        {"id": "gotenba", "name": "御殿場IC", "kind": "IC", "km": 84.4, "lat": 35.309, "lon": 138.940},
+        {"id": "komakado-sic", "name": "駒門スマートIC", "kind": "SIC", "km": 89.5, "lat": 35.308, "lon": 138.917},
+        {"id": "susono", "name": "裾野IC", "kind": "IC", "km": 94.0, "lat": 35.280, "lon": 138.907},
+        {"id": "numazu", "name": "沼津IC", "kind": "IC", "km": 104.0, "lat": 35.136, "lon": 138.862},
+        {"id": "fuji", "name": "富士IC", "kind": "IC", "km": 120.0, "lat": 35.150, "lon": 138.669},
+        {"id": "fujikawa-sa", "name": "富士川SA", "kind": "SA", "km": 131.0, "lat": 35.141, "lon": 138.552},
+        {"id": "shimizu", "name": "清水JCT", "kind": "JCT", "km": 145.0, "lat": 35.032, "lon": 138.490},
+        {"id": "shizuoka", "name": "静岡IC", "kind": "IC", "km": 155.0, "lat": 34.989, "lon": 138.434},
+        {"id": "yaizu", "name": "焼津IC", "kind": "IC", "km": 167.0, "lat": 34.866, "lon": 138.319},
+        {"id": "yoshida", "name": "吉田IC", "kind": "IC", "km": 172.0, "lat": 34.815, "lon": 138.282},
+        {"id": "makinohara-sa", "name": "牧之原SA", "kind": "SA", "km": 186.0, "lat": 34.736, "lon": 138.259},
+        {"id": "kakegawa", "name": "掛川IC", "kind": "IC", "km": 197.0, "lat": 34.804, "lon": 137.994},
+        {"id": "fukuroi", "name": "袋井IC", "kind": "IC", "km": 206.0, "lat": 34.760, "lon": 137.925},
+        {"id": "hamamatsu", "name": "浜松IC", "kind": "IC", "km": 222.0, "lat": 34.744, "lon": 137.794},
+        {"id": "hamamatsu-nishi", "name": "浜松西IC", "kind": "IC", "km": 231.0, "lat": 34.755, "lon": 137.713},
+        {"id": "hamamatsu-sa", "name": "浜名湖SA", "kind": "SA", "km": 241.0, "lat": 34.706, "lon": 137.592}
+      ]
+    },
+    {
+      "id": "shin-tomei",
+      "name": "新東名高速道路",
+      "description": "海老名南JCT〜御殿場JCTのデモ区間",
+      "origin_city": "神奈川県海老名市",
+      "destination_city": "静岡県御殿場市",
+      "landmarks": [
+        {"name": "東京方面", "x": 92, "y": 66, "type": "direction"},
+        {"name": "御殿場・名古屋方面", "x": 8, "y": 22, "type": "direction"},
+        {"name": "相模平野", "x": 70, "y": 34, "type": "landform"},
+        {"name": "富士山遠望", "x": 16, "y": 28, "type": "landform"}
+      ],
+      "nodes": [
+        {"id": "ebina-minami", "name": "海老名南JCT", "kind": "JCT", "km": 0, "lat": 35.397, "lon": 139.399},
+        {"id": "aikawa", "name": "相模原愛川IC", "kind": "IC", "km": 8.1, "lat": 35.551, "lon": 139.343},
+        {"id": "hadano-nakai", "name": "秦野IC", "kind": "IC", "km": 22.5, "lat": 35.386, "lon": 139.206},
+        {"id": "nagaizumi-numazu", "name": "長泉沼津IC", "kind": "IC", "km": 40.2, "lat": 35.141, "lon": 138.858},
+        {"id": "expasa-neopasa", "name": "駿河湾沼津SA", "kind": "SA", "km": 46.4, "lat": 35.122, "lon": 138.808},
+        {"id": "gotenba-jct", "name": "御殿場JCT", "kind": "JCT", "km": 55.4, "lat": 35.300, "lon": 138.935}
+      ]
+    }
+  ]
+}
