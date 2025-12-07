@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>日本高速道路名前パズル</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>日本高速道路名前パズル</h1>
+    <p class="subtitle">IC/JCT/PA/SA名をすべて当てて高速道路を完成させよう！</p>
+  </header>
+
+  <section class="controls">
+    <label for="highway-select">路線:</label>
+    <select id="highway-select"></select>
+    <button id="select-highway">高速道路を選択</button>
+    <button id="reset">すべてリセット</button>
+    <button id="giveup">ギブアップ</button>
+    <label for="zoom-range" class="zoom-label">拡大縮小:</label>
+    <input id="zoom-range" type="range" min="70" max="150" value="100" />
+    <span id="zoom-value">100%</span>
+    <label for="pan-range-x" class="zoom-label">左右移動:</label>
+    <div class="pan-group">
+      <div class="pan-buttons" aria-label="横移動ボタン">
+        <button type="button" class="pan-btn" data-pan-x="120">←</button>
+        <button type="button" class="pan-btn" data-pan-x="-120">→</button>
+      </div>
+      <input id="pan-range-x" type="range" min="-2000" max="2000" value="0" />
+      <span id="pan-value-x">0px</span>
+    </div>
+    <label for="pan-range-y" class="zoom-label">上下移動:</label>
+    <div class="pan-group">
+      <div class="pan-buttons" aria-label="縦移動ボタン">
+        <button type="button" class="pan-btn" data-pan-y="120">↑</button>
+        <button type="button" class="pan-btn" data-pan-y="-120">↓</button>
+      </div>
+      <input id="pan-range-y" type="range" min="-2000" max="2000" value="0" />
+      <span id="pan-value-y">0px</span>
+    </div>
+  </section>
+
+  <section class="legend" aria-label="アイコン凡例">
+    <div class="legend-item"><span class="legend-icon ic" aria-hidden="true"></span>IC（インターチェンジ）</div>
+    <div class="legend-item"><span class="legend-icon sic" aria-hidden="true"></span>SIC（スマートIC）</div>
+    <div class="legend-item"><span class="legend-icon jct" aria-hidden="true"></span>JCT（ジャンクション）</div>
+    <div class="legend-item"><span class="legend-icon pa" aria-hidden="true"></span>PA（パーキングエリア）</div>
+    <div class="legend-item"><span class="legend-icon sa" aria-hidden="true"></span>SA（サービスエリア）</div>
+  </section>
+
+  <main>
+    <div id="highway-info" class="highway-info"></div>
+    <div id="board" class="board" aria-live="polite"></div>
+  </main>
+
+  <template id="node-template">
+    <div class="node">
+      <div class="icon" aria-hidden="true"></div>
+      <label class="sr-only">地点名</label>
+      <input class="node-input" type="text" placeholder="名称を入力" />
+    </div>
+  </template>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
