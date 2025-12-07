@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>高速道路エディター</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body class="editor-page">
+  <header class="app-header">
+    <h1>高速道路エディター</h1>
+    <p class="subtitle">IC等の位置を入力し、緯度経度距離にもとづいて並べ替える補助ツールです。</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>概要</h2>
+      <p class="muted">起点にもっとも近いIC等を順にたどる <strong>最近傍方式</strong> で整列し、距離(km)とJSONスニペットを生成します。位置合わせ用に緯度・経度を必ず入力してください。</p>
+    </section>
+
+    <section class="card">
+      <h2>路線情報</h2>
+      <div class="field-row">
+        <label>路線ID
+          <input type="text" id="hw-id" placeholder="tomei" />
+        </label>
+        <label>路線名
+          <input type="text" id="hw-name" placeholder="東名高速道路" />
+        </label>
+        <label>起点都市
+          <input type="text" id="hw-origin" placeholder="東京都世田谷区" />
+        </label>
+        <label>終点都市
+          <input type="text" id="hw-destination" placeholder="静岡県浜松市西区" />
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>IC/JCT/PA/SAを入力</h2>
+      <div class="table-actions">
+        <button id="add-row">+ 行を追加</button>
+        <span class="pill">行左のラジオが起点</span>
+      </div>
+      <table class="node-table" id="node-table">
+        <thead>
+          <tr>
+            <th>起点</th>
+            <th>区分</th>
+            <th>名称</th>
+            <th>緯度</th>
+            <th>経度</th>
+            <th>接続道路</th>
+            <th>接続都市</th>
+            <th>削除</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <div class="table-actions">
+        <button id="reorder">距離にもとづいて並べ替え</button>
+        <button id="save" class="secondary-link">JSONを保存</button>
+        <span class="muted">入力完了後にクリックしてください。</span>
+      </div>
+      <div id="result" class="muted">まだ結果はありません。</div>
+      <div id="save-status" class="muted"></div>
+      <pre class="json-output" id="json-output" aria-live="polite"></pre>
+    </section>
+  </main>
+
+  <script src="/static/editor.js"></script>
+</body>
+</html>
