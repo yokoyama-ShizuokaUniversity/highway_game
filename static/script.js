@@ -18,8 +18,8 @@ let nodeStates = new Map();
 let zoom = 100;
 let panX = 0;
 let panY = 0;
-const DISTANCE_SCALE = 2.6;
-const MIN_GAP = 28;
+const DISTANCE_SCALE = 1.65;
+const MIN_GAP = 16;
 panValueX.textContent = `${panX}px`;
 panValueY.textContent = `${panY}px`;
 zoomValue.textContent = `${zoom}%`;
@@ -61,8 +61,7 @@ function renderBoard(hw) {
   board.appendChild(container);
 
   const normalizedNodes = computeNormalizedNodes(hw.nodes);
-  const stretchedNodes = stretchNodes(normalizedNodes);
-  const spacedNodes = enforceMinimumSpacing(stretchedNodes);
+  const spacedNodes = applyDirectionalSpacing(normalizedNodes);
   const fittedNodes = fitNodesToViewport(spacedNodes);
   const labelOffsets = computeLabelOffsets(fittedNodes);
 
@@ -234,9 +233,9 @@ function computeLabelOffsets(nodes) {
     const px = -ny;
     const py = nx;
     const neighborDist = Math.hypot(next.x - node.x, next.y - node.y) || 1;
-    const spreadBase = 46;
-    const spreadBoost = Math.max(0, MIN_GAP * 1.3 - neighborDist) * 1.05;
-    const spread = Math.min(110, spreadBase + spreadBoost);
+    const spreadBase = 52;
+    const spreadBoost = Math.max(0, MIN_GAP * 1.2 - neighborDist) * 0.9;
+    const spread = Math.min(120, spreadBase + spreadBoost);
     const side = idx % 2 === 0 ? 1 : -1;
     offsets.set(node.id, { x: px * spread * side, y: py * spread * side });
   });
@@ -302,40 +301,26 @@ function computeNormalizedNodes(nodes) {
   });
 }
 
-function enforceMinimumSpacing(nodes) {
+function applyDirectionalSpacing(nodes) {
   if (!nodes.length) return nodes;
   const adjusted = [nodes[0]];
   for (let i = 1; i < nodes.length; i++) {
-    const prev = adjusted[i - 1];
-    const curr = { ...nodes[i] };
-    let dx = curr.x - prev.x;
-    let dy = curr.y - prev.y;
-    let dist = Math.hypot(dx, dy);
-    if (dist < MIN_GAP) {
-      if (dist === 0) {
-        dx = 1;
-        dy = 0;
-        dist = 1;
-      }
-      const scale = Math.min(MIN_GAP / dist, 2.0);
-      curr.x = prev.x + dx * scale;
-      curr.y = prev.y + dy * scale;
-    }
-    adjusted.push(curr);
+    const prevOriginal = nodes[i - 1];
+    const currOriginal = nodes[i];
+    const dirX = currOriginal.x - prevOriginal.x;
+    const dirY = currOriginal.y - prevOriginal.y;
+    const dist = Math.hypot(dirX, dirY) || 1;
+    const nx = dirX / dist;
+    const ny = dirY / dist;
+    const targetDist = Math.max(dist * DISTANCE_SCALE, MIN_GAP);
+    const prevPlaced = adjusted[i - 1];
+    adjusted.push({
+      ...currOriginal,
+      x: prevPlaced.x + nx * targetDist,
+      y: prevPlaced.y + ny * targetDist,
+    });
   }
   return adjusted;
-}
-
-function stretchNodes(nodes) {
-  if (!nodes.length) return nodes;
-  const layout = measureSpan(nodes);
-  const cx = layout.minX + layout.spanX / 2;
-  const cy = layout.minY + layout.spanY / 2;
-  return nodes.map((n) => ({
-    ...n,
-    x: (n.x - cx) * DISTANCE_SCALE + cx,
-    y: (n.y - cy) * DISTANCE_SCALE + cy,
-  }));
 }
 
 function fitNodesToViewport(nodes) {

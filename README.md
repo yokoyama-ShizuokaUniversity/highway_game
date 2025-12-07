@@ -28,7 +28,7 @@ flask --app editor_app run --debug --port 5001
 
 ## 描画と配置ロジック（コードを読む前の概要）
 - `static/script.js` で `/api/highways` から選択路線を取得し、`computeNormalizedNodes` で緯度経度を平面距離（haversine を使わない簡易換算）へ直し、0〜100% の座標に正規化しています。
-- `enforceMinimumSpacing` で連続ノードの最短間隔を MIN_GAP 以上に強制し、`stretchNodes` で全体スケールを DISTANCE_SCALE 倍に拡大して視認性を確保します。
+- `applyDirectionalSpacing` で各区間の元の方向を保ったまま DISTANCE_SCALE 倍で伸ばしつつ、MIN_GAP 未満の区間は足し込み式で距離を底上げします。以前の全体スケーリング＋強制間隔が線を押し広げすぎて歪む原因だったため、方向ベクトルに沿った伸長へ変えています。
 - `computeLabelOffsets` で道路の進行方向と直交方向ベクトルを求め、近いノードほどオフセットを大きくしつつ左右交互にラベル・入力欄をずらして重なりを回避します。
 - セグメントはアイコン中心座標（%）を起点に絶対長さ(px)で作成し、`updateSegments` が両端が正解なら緑、そうでなければ灰色に塗り分けます。ノードとセグメントの z-index を分離し、線がアイコンや入力欄を邪魔しないようにしています。
 - パンはズーム倍率を考慮した安全幅を計算し、左右上下のスライダーとボタンで `transform: translate(x,y) scale(z)` をかけ直すことで常に端点へ到達できるようにしています。
