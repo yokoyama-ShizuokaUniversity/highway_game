@@ -18,8 +18,8 @@ let nodeStates = new Map();
 let zoom = 100;
 let panX = 0;
 let panY = 0;
-const DISTANCE_SCALE = 2.2;
-const MIN_GAP = 18;
+const DISTANCE_SCALE = 2.6;
+const MIN_GAP = 28;
 panValueX.textContent = `${panX}px`;
 panValueY.textContent = `${panY}px`;
 zoomValue.textContent = `${zoom}%`;
@@ -234,9 +234,9 @@ function computeLabelOffsets(nodes) {
     const px = -ny;
     const py = nx;
     const neighborDist = Math.hypot(next.x - node.x, next.y - node.y) || 1;
-    const spreadBase = 38;
-    const spreadBoost = Math.max(0, MIN_GAP * 1.2 - neighborDist) * 0.9;
-    const spread = Math.min(90, spreadBase + spreadBoost);
+    const spreadBase = 46;
+    const spreadBoost = Math.max(0, MIN_GAP * 1.3 - neighborDist) * 1.05;
+    const spread = Math.min(110, spreadBase + spreadBoost);
     const side = idx % 2 === 0 ? 1 : -1;
     offsets.set(node.id, { x: px * spread * side, y: py * spread * side });
   });
@@ -317,7 +317,7 @@ function enforceMinimumSpacing(nodes) {
         dy = 0;
         dist = 1;
       }
-      const scale = Math.min(MIN_GAP / dist, 1.6);
+      const scale = Math.min(MIN_GAP / dist, 2.0);
       curr.x = prev.x + dx * scale;
       curr.y = prev.y + dy * scale;
     }
