@@ -31,9 +31,11 @@ function addRow(data = {}) {
         <option value="SA" ${data.kind === "SA" ? "selected" : ""}>SA</option>
       </select>
     </td>
-    <td><input type="text" value="${data.name || ""}" placeholder="東京IC" /></td>
+    <td><input type="text" value="${data.name || ""}" placeholder="東京" /></td>
     <td><input type="number" step="0.0001" value="${data.lat || ""}" placeholder="35.6" /></td>
     <td><input type="number" step="0.0001" value="${data.lon || ""}" placeholder="139.6" /></td>
+    <td><input type="text" value="${data.connection_road || ""}" placeholder="圏央道" /></td>
+    <td><input type="text" value="${data.connection_cities || ""}" placeholder="八王子方面" /></td>
     <td><button class="delete-row">削除</button></td>
   `;
   tableBody.appendChild(tr);
@@ -42,8 +44,10 @@ function addRow(data = {}) {
 
 function readRows() {
   return Array.from(tableBody.querySelectorAll("tr")).map((tr, idx) => {
-    const [radio, kindSel, nameInput, latInput, lonInput] = tr.querySelectorAll(
-      "input, select"
+    const radio = tr.querySelector('input[type="radio"]');
+    const kindSel = tr.querySelector("select");
+    const [nameInput, latInput, lonInput, roadInput, citiesInput] = tr.querySelectorAll(
+      'input[type="text"], input[type="number"]'
     );
     return {
       isStart: radio.checked || idx === 0,
@@ -51,6 +55,8 @@ function readRows() {
       name: nameInput.value.trim(),
       lat: Number(latInput.value),
       lon: Number(lonInput.value),
+      connection_road: roadInput.value.trim(),
+      connection_cities: citiesInput.value.trim(),
     };
   });
 }
@@ -136,7 +142,7 @@ function buildHighway(nodes) {
       id = `${id}-${suffix}`;
     }
     usedIds.add(id);
-    return {
+    const nodeData = {
       id,
       name: n.name,
       kind: n.kind,
@@ -146,6 +152,14 @@ function buildHighway(nodes) {
       x: Number(n.x.toFixed(2)),
       y: Number(n.y.toFixed(2)),
     };
+
+    if (n.connection_road) {
+      nodeData.connection_road = n.connection_road;
+    }
+    if (n.connection_cities) {
+      nodeData.connection_cities = n.connection_cities;
+    }
+    return nodeData;
   });
 
   return {
@@ -215,5 +229,5 @@ saveButton.addEventListener("click", () => {
 });
 
 // 初期行を2つ用意
-addRow({ name: "東京IC", kind: "IC", lat: 35.631, lon: 139.639 });
-addRow({ name: "横浜町田IC", kind: "IC", lat: 35.513, lon: 139.47 });
+addRow({ name: "東京", kind: "IC", lat: 35.631, lon: 139.639 });
+addRow({ name: "横浜町田", kind: "IC", lat: 35.513, lon: 139.47 });

@@ -20,6 +20,8 @@ class Node:
     lon: Optional[float] = None
     x: Optional[float] = None
     y: Optional[float] = None
+    connection_road: Optional[str] = None
+    connection_cities: Optional[str] = None
 
 
 @dataclass

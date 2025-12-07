@@ -4,6 +4,10 @@ import json
 from pathlib import Path
 from typing import Dict, List
 
+import json
+from pathlib import Path
+from typing import Dict, List
+
 from flask import Flask, jsonify, render_template, request
 
 DATA_PATH = Path(__file__).parent / "data" / "highways.json"

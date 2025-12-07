@@ -19,6 +19,7 @@ let zoom = 100;
 let panX = 0;
 let panY = 0;
 const DISTANCE_SCALE = 1.9;
+const MIN_GAP = 7.5;
 panValueX.textContent = `${panX}px`;
 panValueY.textContent = `${panY}px`;
 zoomValue.textContent = `${zoom}%`;
@@ -54,12 +55,14 @@ function renderBoard(hw) {
   container.className = "road-container";
 
   // zoom
-  container.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom / 100})`;
+  container.style.transform = `translate(${-panX}px, ${-panY}px) scale(${zoom / 100})`;
   container.style.transformOrigin = "50% 50%";
 
   board.appendChild(container);
 
-  const positionedNodes = stretchNodes(computeNormalizedNodes(hw.nodes));
+  const normalizedNodes = computeNormalizedNodes(hw.nodes);
+  const spacedNodes = enforceMinimumSpacing(normalizedNodes);
+  const positionedNodes = stretchNodes(spacedNodes);
   const labelOffsets = computeLabelOffsets(positionedNodes);
 
   const widthPx = board.clientWidth || 1;
@@ -99,11 +102,11 @@ function renderBoard(hw) {
     const icon = clone.querySelector(".icon");
     const input = clone.querySelector(".node-input");
     input.value = "";
-    const desiredWidth = Math.max(node.name.length + 1, 6);
+    const desiredWidth = Math.max(node.name.length + 3, 8);
     input.style.width = `${desiredWidth}ch`;
     const offset = labelOffsets.get(node.id) || { x: 0, y: 0 };
     input.style.left = `${offset.x}px`;
-    input.style.top = `${34 + offset.y}px`;
+    input.style.top = `${36 + offset.y}px`;
 
     let extraClass = "ic";
     let iconSymbol = "〇";
@@ -133,8 +136,19 @@ function renderBoard(hw) {
     label.className = "node-label";
     label.textContent = `${node.kind}`;
     label.style.left = `${offset.x}px`;
-    label.style.top = `${-28 + offset.y}px`;
+    label.style.top = `${-26 + offset.y}px`;
     clone.appendChild(label);
+
+    if (node.kind === "JCT" && (node.connection_road || node.connection_cities)) {
+      const conn = document.createElement("div");
+      conn.className = "jct-connection";
+      const road = node.connection_road ? `接続: ${node.connection_road}` : "";
+      const cities = node.connection_cities ? `（${node.connection_cities}）` : "";
+      conn.textContent = `${road}${cities}`.trim();
+      conn.style.left = `${offset.x}px`;
+      conn.style.top = `${12 + offset.y}px`;
+      clone.appendChild(conn);
+    }
 
     container.appendChild(clone);
     nodeStates.set(node.id, { correct: false, filled: false, expected: node.name });
@@ -219,7 +233,7 @@ function computeLabelOffsets(nodes) {
     const ny = vy / len;
     const px = -ny;
     const py = nx;
-    const spread = 26;
+    const spread = 32;
     const side = idx % 2 === 0 ? 1 : -1;
     offsets.set(node.id, { x: px * spread * side, y: py * spread * side });
   });
@@ -283,6 +297,30 @@ function computeNormalizedNodes(nodes) {
     const normY = 100 - (coords[idx].dy / span) * 100;
     return { ...node, x: normX, y: normY };
   });
+}
+
+function enforceMinimumSpacing(nodes) {
+  if (!nodes.length) return nodes;
+  const adjusted = [nodes[0]];
+  for (let i = 1; i < nodes.length; i++) {
+    const prev = adjusted[i - 1];
+    const curr = { ...nodes[i] };
+    let dx = curr.x - prev.x;
+    let dy = curr.y - prev.y;
+    let dist = Math.hypot(dx, dy);
+    if (dist < MIN_GAP) {
+      if (dist === 0) {
+        dx = 1;
+        dy = 0;
+        dist = 1;
+      }
+      const scale = MIN_GAP / dist;
+      curr.x = prev.x + dx * scale;
+      curr.y = prev.y + dy * scale;
+    }
+    adjusted.push(curr);
+  }
+  return adjusted;
 }
 
 function stretchNodes(nodes) {
