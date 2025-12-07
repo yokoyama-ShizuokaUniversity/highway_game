@@ -7,14 +7,18 @@ const info = document.getElementById("highway-info");
 const nodeTemplate = document.getElementById("node-template");
 const zoomRange = document.getElementById("zoom-range");
 const zoomValue = document.getElementById("zoom-value");
-const panRange = document.getElementById("pan-range");
-const panValue = document.getElementById("pan-value");
+const panRangeX = document.getElementById("pan-range-x");
+const panRangeY = document.getElementById("pan-range-y");
+const panValueX = document.getElementById("pan-value-x");
+const panValueY = document.getElementById("pan-value-y");
 
 let currentHighway = null;
 let nodeStates = new Map();
 let zoom = 100;
 let panX = 0;
-panValue.textContent = `${panX}px`;
+let panY = 0;
+panValueX.textContent = `${panX}px`;
+panValueY.textContent = `${panY}px`;
 zoomValue.textContent = `${zoom}%`;
 
 async function loadHighways() {
@@ -48,18 +52,18 @@ function renderBoard(hw) {
   container.className = "road-container";
 
   // zoom
-  container.style.transform = `translate(${panX}px, 0) scale(${zoom / 100})`;
+  container.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom / 100})`;
   container.style.transformOrigin = "50% 50%";
 
   board.appendChild(container);
 
-  const positionedNodes = hw.nodes.map((node) => ({
-    ...node,
-    x: typeof node.x === "number" ? node.x : 0,
-    y: typeof node.y === "number" ? node.y : 50,
-  }));
+  const positionedNodes = computeNormalizedNodes(hw.nodes);
 
-  const widthPx = board.clientWidth;
+  const widthPx = board.clientWidth || 1;
+  const layout = measureSpan(positionedNodes);
+  const baseHeight = Math.max(320, (layout.spanY / layout.spanX || 0) * widthPx, 240);
+  container.style.height = `${baseHeight}px`;
+
   const heightPx = container.offsetHeight || 1;
 
   // segments between consecutive nodes
@@ -186,6 +190,58 @@ function isCorrectInput(userInput, expected) {
   return normalizedInput === normalizedExpected;
 }
 
+function measureSpan(nodes) {
+  const xs = nodes.map((n) => (typeof n.x === "number" ? n.x : 0));
+  const ys = nodes.map((n) => (typeof n.y === "number" ? n.y : 0));
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  return {
+    minX,
+    maxX,
+    minY,
+    maxY,
+    spanX: Math.max(maxX - minX, 1),
+    spanY: Math.max(maxY - minY, 1),
+  };
+}
+
+function computeNormalizedNodes(nodes) {
+  const hasGeo = nodes.every(
+    (n) => typeof n.lat === "number" && typeof n.lon === "number"
+  );
+  if (!hasGeo) {
+    return nodes.map((node) => ({
+      ...node,
+      x: typeof node.x === "number" ? node.x : 0,
+      y: typeof node.y === "number" ? node.y : 50,
+    }));
+  }
+
+  const minLat = Math.min(...nodes.map((n) => n.lat));
+  const minLon = Math.min(...nodes.map((n) => n.lon));
+  const meanLatRad =
+    (nodes.reduce((sum, n) => sum + (n.lat || 0), 0) / Math.max(nodes.length, 1)) *
+    (Math.PI / 180);
+
+  const coords = nodes.map((n) => {
+    const dx = (n.lon - minLon) * 111.32 * Math.cos(meanLatRad);
+    const dy = (n.lat - minLat) * 110.574;
+    return { dx, dy };
+  });
+
+  const spanX = Math.max(...coords.map((c) => c.dx), 1e-6);
+  const spanY = Math.max(...coords.map((c) => c.dy), 1e-6);
+  const span = Math.max(spanX, spanY, 1e-6);
+
+  return nodes.map((node, idx) => {
+    const normX = (coords[idx].dx / span) * 100;
+    const normY = 100 - (coords[idx].dy / span) * 100;
+    return { ...node, x: normX, y: normY };
+  });
+}
+
 function updateNodeUI(nodeId, entry, hasInput) {
   const nodeEl = board.querySelector(`[data-node-id="${nodeId}"]`);
   if (!nodeEl) return;
@@ -245,9 +301,17 @@ zoomRange.addEventListener("input", (e) => {
     renderBoard(currentHighway);
   }
 });
-panRange.addEventListener("input", (e) => {
+panRangeX.addEventListener("input", (e) => {
   panX = Number(e.target.value);
-  panValue.textContent = `${panX}px`;
+  panValueX.textContent = `${panX}px`;
+  if (currentHighway) {
+    renderBoard(currentHighway);
+  }
+});
+
+panRangeY.addEventListener("input", (e) => {
+  panY = Number(e.target.value);
+  panValueY.textContent = `${panY}px`;
   if (currentHighway) {
     renderBoard(currentHighway);
   }

@@ -16,6 +16,8 @@ class Node:
     name: str
     kind: str  # IC, JCT, PA, SA
     km: float
+    lat: Optional[float] = None
+    lon: Optional[float] = None
     x: Optional[float] = None
     y: Optional[float] = None
 
@@ -25,6 +27,8 @@ class Highway:
     id: str
     name: str
     description: str
+    origin_city: Optional[str]
+    destination_city: Optional[str]
     landmarks: List[Dict[str, float]]
     nodes: List[Node]
 
@@ -33,6 +37,8 @@ class Highway:
             "id": self.id,
             "name": self.name,
             "description": self.description,
+            "origin_city": self.origin_city,
+            "destination_city": self.destination_city,
             "landmarks": self.landmarks,
             "nodes": [asdict(node) for node in self.nodes],
         }
@@ -49,6 +55,8 @@ def load_highways() -> Dict[str, Highway]:
             id=hw["id"],
             name=hw["name"],
             description=hw.get("description", ""),
+            origin_city=hw.get("origin_city"),
+            destination_city=hw.get("destination_city"),
             landmarks=hw.get("landmarks", []),
             nodes=[Node(**node) for node in hw.get("nodes", [])],
         )
@@ -62,6 +70,11 @@ highways: Dict[str, Highway] = load_highways()
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@app.route("/editor")
+def editor():
+    return render_template("editor.html")
 
 
 @app.route("/api/highways")
