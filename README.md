@@ -26,6 +26,13 @@
 flask --app editor_app run --debug --port 5001
 ```
 
+## 描画と配置ロジック（コードを読む前の概要）
+- `static/script.js` で `/api/highways` から選択路線を取得し、`computeNormalizedNodes` で緯度経度を平面距離（haversine を使わない簡易換算）へ直し、0〜100% の座標に正規化しています。
+- `enforceMinimumSpacing` で連続ノードの最短間隔を MIN_GAP 以上に強制し、`stretchNodes` で全体スケールを DISTANCE_SCALE 倍に拡大して視認性を確保します。
+- `computeLabelOffsets` で道路の進行方向と直交方向ベクトルを求め、近いノードほどオフセットを大きくしつつ左右交互にラベル・入力欄をずらして重なりを回避します。
+- セグメントはアイコン中心座標（%）を起点に絶対長さ(px)で作成し、`updateSegments` が両端が正解なら緑、そうでなければ灰色に塗り分けます。ノードとセグメントの z-index を分離し、線がアイコンや入力欄を邪魔しないようにしています。
+- パンはズーム倍率を考慮した安全幅を計算し、左右上下のスライダーとボタンで `transform: translate(x,y) scale(z)` をかけ直すことで常に端点へ到達できるようにしています。
+
 ## 遊び方
 
 - 上部のプルダウンで高速道路を選択し、「高速道路を選択」ボタンでロードします。東名／新東名のデモデータは `data/highways.json` から読み込みます。
