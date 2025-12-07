@@ -157,7 +157,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--ink);
   background: white;
   border: 3px solid var(--ink);
   border-radius: 50%;
@@ -171,7 +170,6 @@ body {
 .node.pa .icon {
   border-radius: 4px;
   background: var(--ink);
-  color: white;
 }
 
 .node.sa .icon {
@@ -181,7 +179,7 @@ body {
 
 .node.sic .icon {
   background: var(--ink);
-  color: white;
+  border-color: var(--ink);
 }
 
 .node.jct .icon {
@@ -189,10 +187,6 @@ body {
   height: 32px;
   border-radius: 6px;
   transform: translate(-50%, -50%) rotate(45deg);
-}
-
-.node.jct .icon span {
-  transform: rotate(-45deg);
 }
 
 .node-input {
@@ -311,11 +305,6 @@ body {
 .legend-icon.jct {
   border-radius: 6px;
   transform: rotate(45deg);
-}
-
-.legend-icon.jct span {
-  transform: rotate(-45deg);
-  display: inline-block;
 }
 
 .legend-icon.sic {

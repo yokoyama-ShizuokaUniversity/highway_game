@@ -18,8 +18,8 @@ let nodeStates = new Map();
 let zoom = 100;
 let panX = 0;
 let panY = 0;
-const DISTANCE_SCALE = 1.9;
-const MIN_GAP = 7.5;
+const DISTANCE_SCALE = 2.3;
+const MIN_GAP = 14;
 panValueX.textContent = `${panX}px`;
 panValueY.textContent = `${panY}px`;
 zoomValue.textContent = `${zoom}%`;
@@ -54,8 +54,8 @@ function renderBoard(hw) {
   const container = document.createElement("div");
   container.className = "road-container";
 
-  // zoom
-  container.style.transform = `translate(${-panX}px, ${-panY}px) scale(${zoom / 100})`;
+  // zoom & pan
+  container.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom / 100})`;
   container.style.transformOrigin = "50% 50%";
 
   board.appendChild(container);
@@ -71,6 +71,12 @@ function renderBoard(hw) {
   container.style.height = `${baseHeight}px`;
 
   const heightPx = container.offsetHeight || 1;
+
+  const spanWidthPx = (layout.spanX / 100) * widthPx * (zoom / 100);
+  const spanHeightPx = (layout.spanY / 100) * heightPx * (zoom / 100);
+  const safetyX = Math.max(widthPx, spanWidthPx) + 200;
+  const safetyY = Math.max(heightPx, spanHeightPx) + 200;
+  syncPanLimits(safetyX, safetyY);
 
   // segments between consecutive nodes
   for (let i = 0; i < positionedNodes.length - 1; i++) {
@@ -109,24 +115,17 @@ function renderBoard(hw) {
     input.style.top = `${36 + offset.y}px`;
 
     let extraClass = "ic";
-    let iconSymbol = "〇";
+    let iconSymbol = "";
     if (node.kind === "JCT") {
       extraClass = "jct";
-      iconSymbol = "◇";
     } else if (node.kind === "PA") {
       extraClass = "pa";
-      iconSymbol = "■";
     } else if (node.kind === "SA") {
       extraClass = "sa";
-      iconSymbol = "□";
     } else if (node.kind === "SIC") {
       extraClass = "sic";
-      iconSymbol = "●";
     }
-    icon.textContent = "";
-    const iconGlyph = document.createElement("span");
-    iconGlyph.textContent = iconSymbol;
-    icon.appendChild(iconGlyph);
+    icon.textContent = iconSymbol;
     icon.setAttribute("aria-label", `${node.name} (${node.kind})`);
     clone.classList.add(extraClass);
 
@@ -233,7 +232,7 @@ function computeLabelOffsets(nodes) {
     const ny = vy / len;
     const px = -ny;
     const py = nx;
-    const spread = 32;
+    const spread = 40;
     const side = idx % 2 === 0 ? 1 : -1;
     offsets.set(node.id, { x: px * spread * side, y: py * spread * side });
   });
@@ -341,11 +340,28 @@ function clampToRange(value, input) {
   return Math.min(max, Math.max(min, value));
 }
 
+function clampValue(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function syncPanLimits(limitX, limitY) {
+  panRangeX.min = -Math.abs(limitX);
+  panRangeX.max = Math.abs(limitX);
+  panRangeY.min = -Math.abs(limitY);
+  panRangeY.max = Math.abs(limitY);
+  panX = clampValue(panX, Number(panRangeX.min), Number(panRangeX.max));
+  panY = clampValue(panY, Number(panRangeY.min), Number(panRangeY.max));
+  panRangeX.value = -panX;
+  panRangeY.value = -panY;
+  panValueX.textContent = `${panRangeX.value}px`;
+  panValueY.textContent = `${panRangeY.value}px`;
+}
+
 function applyPan() {
-  panRangeX.value = panX;
-  panRangeY.value = panY;
-  panValueX.textContent = `${panX}px`;
-  panValueY.textContent = `${panY}px`;
+  panRangeX.value = -panX;
+  panRangeY.value = -panY;
+  panValueX.textContent = `${panRangeX.value}px`;
+  panValueY.textContent = `${panRangeY.value}px`;
   if (currentHighway) {
     renderBoard(currentHighway);
   }
@@ -411,16 +427,18 @@ zoomRange.addEventListener("input", (e) => {
   }
 });
 panRangeX.addEventListener("input", (e) => {
-  panX = Number(e.target.value);
-  panValueX.textContent = `${panX}px`;
+  const requested = -Number(e.target.value);
+  panX = clampValue(requested, Number(panRangeX.min), Number(panRangeX.max));
+  panValueX.textContent = `${-panX}px`;
   if (currentHighway) {
     renderBoard(currentHighway);
   }
 });
 
 panRangeY.addEventListener("input", (e) => {
-  panY = Number(e.target.value);
-  panValueY.textContent = `${panY}px`;
+  const requested = -Number(e.target.value);
+  panY = clampValue(requested, Number(panRangeY.min), Number(panRangeY.max));
+  panValueY.textContent = `${-panY}px`;
   if (currentHighway) {
     renderBoard(currentHighway);
   }
@@ -430,8 +448,8 @@ panButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     const deltaX = Number(btn.dataset.panX || 0);
     const deltaY = Number(btn.dataset.panY || 0);
-    panX = clampToRange(panX + deltaX, panRangeX);
-    panY = clampToRange(panY + deltaY, panRangeY);
+    panX = clampValue(panX + deltaX, Number(panRangeX.min), Number(panRangeX.max));
+    panY = clampValue(panY + deltaY, Number(panRangeY.min), Number(panRangeY.max));
     applyPan();
   });
 });
