@@ -18,8 +18,8 @@ let nodeStates = new Map();
 let zoom = 100;
 let panX = 0;
 let panY = 0;
-const DISTANCE_SCALE = 2.9;
-const MIN_GAP = 32;
+const DISTANCE_SCALE = 2.2;
+const MIN_GAP = 14;
 panValueX.textContent = `${panX}px`;
 panValueY.textContent = `${panY}px`;
 zoomValue.textContent = `${zoom}%`;
@@ -61,12 +61,13 @@ function renderBoard(hw) {
   board.appendChild(container);
 
   const normalizedNodes = computeNormalizedNodes(hw.nodes);
-  const spacedNodes = enforceMinimumSpacing(normalizedNodes);
-  const positionedNodes = stretchNodes(spacedNodes);
-  const labelOffsets = computeLabelOffsets(positionedNodes);
+  const stretchedNodes = stretchNodes(normalizedNodes);
+  const spacedNodes = enforceMinimumSpacing(stretchedNodes);
+  const fittedNodes = fitNodesToViewport(spacedNodes);
+  const labelOffsets = computeLabelOffsets(fittedNodes);
 
   const widthPx = board.clientWidth || 1;
-  const layout = measureSpan(positionedNodes);
+  const layout = measureSpan(fittedNodes);
   const baseHeight = Math.max(320, (layout.spanY / layout.spanX || 0) * widthPx, 240);
   container.style.height = `${baseHeight}px`;
 
@@ -79,9 +80,9 @@ function renderBoard(hw) {
   syncPanLimits(safetyX, safetyY);
 
   // segments between consecutive nodes
-  for (let i = 0; i < positionedNodes.length - 1; i++) {
-    const start = positionedNodes[i];
-    const end = positionedNodes[i + 1];
+  for (let i = 0; i < fittedNodes.length - 1; i++) {
+    const start = fittedNodes[i];
+    const end = fittedNodes[i + 1];
     const dx = end.x - start.x;
     const dy = end.y - start.y;
     const scaledDx = (dx / 100) * widthPx;
@@ -99,7 +100,7 @@ function renderBoard(hw) {
     container.appendChild(segment);
   }
 
-  positionedNodes.forEach((node) => {
+  fittedNodes.forEach((node) => {
     const clone = nodeTemplate.content.firstElementChild.cloneNode(true);
     clone.style.left = `${node.x}%`;
     clone.style.top = `${node.y}%`;
@@ -314,7 +315,7 @@ function enforceMinimumSpacing(nodes) {
         dy = 0;
         dist = 1;
       }
-      const scale = MIN_GAP / dist;
+      const scale = Math.min(MIN_GAP / dist, 1.6);
       curr.x = prev.x + dx * scale;
       curr.y = prev.y + dy * scale;
     }
@@ -332,6 +333,23 @@ function stretchNodes(nodes) {
     ...n,
     x: (n.x - cx) * DISTANCE_SCALE + cx,
     y: (n.y - cy) * DISTANCE_SCALE + cy,
+  }));
+}
+
+function fitNodesToViewport(nodes) {
+  if (!nodes.length) return nodes;
+  const layout = measureSpan(nodes);
+  const margin = 6; // keep icons within view and away from edges
+  return nodes.map((n) => ({
+    ...n,
+    x:
+      ((n.x - layout.minX) / Math.max(layout.spanX, 1e-6)) *
+        (100 - margin * 2) +
+      margin,
+    y:
+      ((n.y - layout.minY) / Math.max(layout.spanY, 1e-6)) *
+        (100 - margin * 2) +
+      margin,
   }));
 }
 
