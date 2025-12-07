@@ -11,13 +11,14 @@ const panRangeX = document.getElementById("pan-range-x");
 const panRangeY = document.getElementById("pan-range-y");
 const panValueX = document.getElementById("pan-value-x");
 const panValueY = document.getElementById("pan-value-y");
+const panButtons = document.querySelectorAll(".pan-btn");
 
 let currentHighway = null;
 let nodeStates = new Map();
 let zoom = 100;
 let panX = 0;
 let panY = 0;
-const DISTANCE_SCALE = 1.25;
+const DISTANCE_SCALE = 1.9;
 panValueX.textContent = `${panX}px`;
 panValueY.textContent = `${panY}px`;
 zoomValue.textContent = `${zoom}%`;
@@ -255,6 +256,22 @@ function stretchNodes(nodes) {
   }));
 }
 
+function clampToRange(value, input) {
+  const min = Number(input.min);
+  const max = Number(input.max);
+  return Math.min(max, Math.max(min, value));
+}
+
+function applyPan() {
+  panRangeX.value = panX;
+  panRangeY.value = panY;
+  panValueX.textContent = `${panX}px`;
+  panValueY.textContent = `${panY}px`;
+  if (currentHighway) {
+    renderBoard(currentHighway);
+  }
+}
+
 function updateNodeUI(nodeId, entry, hasInput) {
   const nodeEl = board.querySelector(`[data-node-id="${nodeId}"]`);
   if (!nodeEl) return;
@@ -328,6 +345,16 @@ panRangeY.addEventListener("input", (e) => {
   if (currentHighway) {
     renderBoard(currentHighway);
   }
+});
+
+panButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const deltaX = Number(btn.dataset.panX || 0);
+    const deltaY = Number(btn.dataset.panY || 0);
+    panX = clampToRange(panX + deltaX, panRangeX);
+    panY = clampToRange(panY + deltaY, panRangeY);
+    applyPan();
+  });
 });
 
 loadHighways();

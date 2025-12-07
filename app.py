@@ -64,9 +64,6 @@ def load_highways() -> Dict[str, Highway]:
     return loaded
 
 
-highways: Dict[str, Highway] = load_highways()
-
-
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -74,12 +71,14 @@ def index():
 
 @app.route("/api/highways")
 def list_highways():
+    highways = load_highways()
     data = [highway.to_dict() for highway in highways.values()]
     return jsonify(data)
 
 
 @app.route("/api/highways/<highway_id>")
 def get_highway(highway_id: str):
+    highways = load_highways()
     highway = highways.get(highway_id)
     if not highway:
         return jsonify({"error": "not found"}), 404
